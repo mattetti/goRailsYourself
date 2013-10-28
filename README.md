@@ -6,10 +6,10 @@ A suite of random functions needed when porting/mixing Go/Rails code. Use at you
 
 ## Usage:
 
-    `inflector.Parameterize("Matt Aïmonetti", "-") => "matt-aimonetti"`
+    inflector.Parameterize("Matt Aïmonetti", "-") => "matt-aimonetti"
 
 
-See the documentation and the test suite for more examples.
+See the [documentation](http://godoc.org/github.com/mattetti/goRailsYourself) and/or the test suite for more examples.
 
 ## Dependencies:
 
