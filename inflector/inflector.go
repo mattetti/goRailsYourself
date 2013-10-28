@@ -1,3 +1,5 @@
+// The inflector package ports some of Rails' ActiveSupport functions that
+// can be useful outside of Rails.
 package inflector
 
 import (
