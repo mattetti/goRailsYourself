@@ -1,5 +1,7 @@
 // The inflector package ports some of Rails' ActiveSupport functions that
 // can be useful outside of Rails.
+//
+// Rails documentation http://api.rubyonrails.org/classes/ActiveSupport/Inflector.html
 package inflector
 
 import (
@@ -8,16 +10,17 @@ import (
 	"strings"
 )
 
-var ParameterizeReplacementRegexp = regexp.MustCompile("(?i)[^a-z0-9-_]+")
+var parameterizeReplacementRegexp = regexp.MustCompile("(?i)[^a-z0-9-_]+")
 
 // Replaces special characters in a string so that it may be used as part of
 // a 'pretty' URL.
 //
+// Rails documentation: http://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-parameterize
 func Parameterize(str, sep string) string {
 	// replace accented chars with their ascii equivalents
 	str = Transliterate(str)
 	// Turn unwanted chars into the separator
-	strB := ParameterizeReplacementRegexp.ReplaceAllLiteral([]byte(str), []byte(sep))
+	strB := parameterizeReplacementRegexp.ReplaceAllLiteral([]byte(str), []byte(sep))
 	// No more than one of the separator in a row.
 	re := regexp.MustCompile(sep + `{2,}`)
 	strB = re.ReplaceAllLiteral(strB, []byte(sep))
@@ -31,6 +34,7 @@ func Parameterize(str, sep string) string {
 
 // Replaces non-ASCII characters with an ASCII approximation, or if none
 // Transliterate("Ærøskøbing") => "AEroskobing"
+// Rails documentation: http://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-transliterate
 func Transliterate(str string) string {
 	return unidecode.Unidecode(str)
 }
