@@ -21,11 +21,20 @@ type MessageVerifier struct {
 	serializer MsgSerializer
 }
 
+// Checks that the struct is properly set and ready for use.
+func (crypt *MessageVerifier) IsValid() (bool, error) {
+	err := crypt.checkInit()
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // Verify() takes a base64 encoded message string joined to a digest by a double dash "--"
 // and returns an error if anything wrong happen.
 // If the verification worked, the target interface object passed is populated.
 func (crypt *MessageVerifier) Verify(msg string, target interface{}) error {
-  // TODO: check that the target is a pointer.
+	// TODO: check that the target is a pointer.
 	err := crypt.checkInit()
 	if err != nil {
 		return err
