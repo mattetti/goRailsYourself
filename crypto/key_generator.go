@@ -17,7 +17,7 @@ type KeyGenerator struct {
 func (g *KeyGenerator) Generate(salt []byte, keySize int) []byte {
   // set a default
   if g.Iterations == 0 {
-    g.Iterations = 64
+    g.Iterations = 65536 //2**16, Rails default.
   }
-  return pbkdf2.Key([]byte(g.Secret), salt, 4096, keySize, sha1.New)
+  return pbkdf2.Key([]byte(g.Secret), salt, g.Iterations, keySize, sha1.New)
 }
