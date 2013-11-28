@@ -14,7 +14,7 @@ func TestMessageEncryptorDefaultSettings(t *testing.T) {
 	g.Describe("MessageEncryptor with default settings", func() {
 		k := GenerateRandomKey(32)
 		signKey := "this is a secret!"
-		e := MessageEncryptor{key: k, signKey: signKey}
+		e := MessageEncryptor{Key: k, SignKey: signKey}
 		g.It("can round trip an encoded/unsigned string", func() {
 			msg, err := e.Encrypt("my secret data")
 			g.Assert(err).Eql(nil)
@@ -41,7 +41,7 @@ func TestMessageEncryptor(t *testing.T) {
 
 	g.Describe("MessageEncryptor properly setup using aes cbc", func() {
 		newCrypt := func() MessageEncryptor {
-			return MessageEncryptor{key: GenerateRandomKey(32),
+			return MessageEncryptor{Key: GenerateRandomKey(32),
 				cipher: "aes-cbc",
 				verifier: &MessageVerifier{
 					secret:     "signature secret!",
@@ -127,7 +127,7 @@ func ExampleMessageEncryptor_EncryptAndSign() {
 
 	k := GenerateRandomKey(32)
 	signKey := "this is a secret!"
-	e := MessageEncryptor{key: k, signKey: signKey}
+	e := MessageEncryptor{Key: k, SignKey: signKey}
 
 	// string encoding example
 	msg, err := e.EncryptAndSign("my secret data")
@@ -155,7 +155,7 @@ func ExampleMessageEncryptor_DecryptAndVerify() {
 
 	k := GenerateRandomKey(32)
 	signKey := "this is a secret!"
-	e := MessageEncryptor{key: k, signKey: signKey}
+	e := MessageEncryptor{Key: k, SignKey: signKey}
 	// string encoding example
 	encryptedString, err := e.EncryptAndSign("my secret data")
 	if err != nil {

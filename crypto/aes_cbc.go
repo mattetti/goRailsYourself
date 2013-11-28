@@ -12,7 +12,7 @@ import (
 
 func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) {
 	// TODO: check the crypt is properly initiated
-	block, err := aes.NewCipher(crypt.key)
+	block, err := aes.NewCipher(crypt.Key)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +50,7 @@ func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) 
 }
 
 func (crypt *MessageEncryptor) aesCbcDecrypt(encryptedMsg string, target interface{}) error {
-	block, err := aes.NewCipher(crypt.key)
+	block, err := aes.NewCipher(crypt.Key)
 	if err != nil {
 		return err
 	}

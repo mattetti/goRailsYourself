@@ -30,10 +30,10 @@ import (
 // encrypted_data = crypt.encrypt_and_sign('my secret data')              # => "emsxbm5HcVJWRmhZTzNPTEFjTERHUjJjbmpIWXF5UzNITWhMem5sUnNZRT0tLVVCak1GeDFrSHVxaGFyeVpqRlVLNHc9PQ==--789d60509d8b441a24600bbf48af47d3eff386b5"
 // crypt.decrypt_and_verify(encrypted_data)                               # => "my secret data"
 type MessageEncryptor struct {
-	key []byte
+	Key []byte
 	// optionial property used to automatically set the
 	// verifier if not already set.
-	signKey    string
+	SignKey    string
 	cipher     string
 	verifier   *MessageVerifier
 	serializer MsgSerializer
@@ -49,9 +49,9 @@ type MessageEncryptor struct {
 // and is encoded using base64.
 func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error) {
 	// Set a default verifier if a signature key was given instead of setting the verifier directly.
-	if crypt.verifier == nil && crypt.signKey != "" {
+	if crypt.verifier == nil && crypt.SignKey != "" {
 		crypt.verifier = &MessageVerifier{
-			secret:     crypt.signKey,
+			secret:     crypt.SignKey,
 			hasher:     sha1.New,
 			serializer: NullMsgSerializer{},
 		}
