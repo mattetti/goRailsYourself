@@ -8,6 +8,34 @@ import (
 	"testing"
 )
 
+func TestMessageEncryptorDefaultSettings(t *testing.T) {
+	g := Goblin(t)
+
+	g.Describe("MessageEncryptor with default settings", func() {
+		k := GenerateRandomKey(32)
+		signKey := "this is a secret!"
+		e := MessageEncryptor{key: k, signKey: signKey}
+		g.It("can round trip an encoded/unsigned string", func() {
+			msg, err := e.Encrypt("my secret data")
+			g.Assert(err).Eql(nil)
+			var newMsg string
+			err = e.Decrypt(msg, &newMsg)
+			g.Assert(err).Eql(nil)
+			g.Assert(newMsg).Eql("my secret data")
+		})
+		g.It("can round trip an encoded/signed string", func() {
+			msg, err := e.EncryptAndSign("my secret data")
+			g.Assert(err).Eql(nil)
+			var newMsg string
+			err = e.DecryptAndVerify(msg, &newMsg)
+			g.Assert(err).Eql(nil)
+			//g.Assert(newMsg).Eql("my secret data")
+		})
+
+	})
+
+}
+
 func TestMessageEncryptor(t *testing.T) {
 	g := Goblin(t)
 
@@ -15,7 +43,7 @@ func TestMessageEncryptor(t *testing.T) {
 		newCrypt := func() MessageEncryptor {
 			return MessageEncryptor{key: GenerateRandomKey(32),
 				cipher: "aes-cbc",
-				verifier: MessageVerifier{
+				verifier: &MessageVerifier{
 					secret:     "signature secret!",
 					hasher:     sha1.New,
 					serializer: NullMsgSerializer{},
@@ -86,4 +114,76 @@ func TestMessageEncryptor(t *testing.T) {
 			g.Assert(output).Eql(testData)
 		})
 	})
+}
+
+func ExampleMessageEncryptor_EncryptAndSign() {
+	type Person struct {
+		Id        int    `json:"id"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Age       int    `json:"age"`
+	}
+	john := Person{Id: 12, FirstName: "John", LastName: "Doe", Age: 42}
+
+	k := GenerateRandomKey(32)
+	signKey := "this is a secret!"
+	e := MessageEncryptor{key: k, signKey: signKey}
+
+	// string encoding example
+	msg, err := e.EncryptAndSign("my secret data")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(msg)
+
+	// struct encoding example
+	msg, err = e.EncryptAndSign(john)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(msg)
+}
+
+func ExampleMessageEncryptor_DecryptAndVerify() {
+	type Person struct {
+		Id        int    `json:"id"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Age       int    `json:"age"`
+	}
+	john := Person{Id: 12, FirstName: "John", LastName: "Doe", Age: 42}
+
+	k := GenerateRandomKey(32)
+	signKey := "this is a secret!"
+	e := MessageEncryptor{key: k, signKey: signKey}
+	// string encoding example
+	encryptedString, err := e.EncryptAndSign("my secret data")
+	if err != nil {
+		panic(err)
+	}
+	// struct encoding example
+	encryptedPerson, err := e.EncryptAndSign(john)
+	if err != nil {
+		panic(err)
+	}
+
+	// decrypting a string message
+	var decryptedString string
+	err = e.DecryptAndVerify(encryptedString, &decryptedString)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(decryptedString)
+
+	// decrypting the person object
+	var decryptedPerson Person
+	err = e.DecryptAndVerify(encryptedPerson, &decryptedPerson)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%#v\n", decryptedPerson)
+
+	//Output:
+	// my secret data
+	// crypto.Person{Id:12, FirstName:"John", LastName:"Doe", Age:42}
 }

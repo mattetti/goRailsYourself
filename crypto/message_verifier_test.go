@@ -194,7 +194,7 @@ func TestMessageVerifier(t *testing.T) {
 
 	})
 
-	g.Describe("with a secret and a XML serializer", func() {
+	g.Describe("A MessageVerifier with a secret and a XML serializer", func() {
 
 		v := MessageVerifier{
 			secret:     "Hey, I'm another secret!",

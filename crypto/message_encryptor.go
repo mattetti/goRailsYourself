@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"crypto/sha1"
 	"errors"
 )
 
@@ -29,17 +30,37 @@ import (
 // encrypted_data = crypt.encrypt_and_sign('my secret data')              # => "emsxbm5HcVJWRmhZTzNPTEFjTERHUjJjbmpIWXF5UzNITWhMem5sUnNZRT0tLVVCak1GeDFrSHVxaGFyeVpqRlVLNHc9PQ==--789d60509d8b441a24600bbf48af47d3eff386b5"
 // crypt.decrypt_and_verify(encrypted_data)                               # => "my secret data"
 type MessageEncryptor struct {
-	key        []byte
+	key []byte
+	// optionial property used to automatically set the
+	// verifier if not already set.
+	signKey    string
 	cipher     string
-	verifier   MessageVerifier
+	verifier   *MessageVerifier
 	serializer MsgSerializer
 }
 
-// Encrypt and sign a message. We need to sign the message in order to avoid
-// padding attacks. Reference: http://www.limited-entropy.com/padding-oracle-attacks.
+// Encrypt and sign a message (string, struct, anything that can be safely serialized/serialized).
+// Note that even if you can just Encrypt()
+// in most cases you shouldn't use it directly and instead use this method.
+// The reason is that we need to sign the message in order to avoid
+// padding attacks.
+// Reference: http://www.limited-entropy.com/padding-oracle-attacks.
+// The output string can be converted back using DecryptAndVerify()
+// and is encoded using base64.
 func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error) {
-	vValid, err := crypt.verifier.IsValid()
-	if vValid != true {
+	// Set a default verifier if a signature key was given instead of setting the verifier directly.
+	if crypt.verifier == nil && crypt.signKey != "" {
+		crypt.verifier = &MessageVerifier{
+			secret:     crypt.signKey,
+			hasher:     sha1.New,
+			serializer: NullMsgSerializer{},
+		}
+	}
+	if crypt.verifier == nil {
+		return "", errors.New("Verifier and/or signature key not set: ")
+	}
+	vvalid, err := crypt.verifier.IsValid()
+	if !vvalid {
 		return "", errors.New("Verifier not properly set: " + err.Error())
 	}
 	encryptedMsg, err := crypt.Encrypt(value)
@@ -49,7 +70,7 @@ func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error)
 	return crypt.verifier.Generate(encryptedMsg)
 }
 
-// Decrypt and verify a message. We need to verify the message in order to
+// Decrypt and verify a message. Messages need to be signed on top of being encrypted in order to
 // avoid padding attacks. Reference: http://www.limited-entropy.com/padding-oracle-attacks.
 // The serializer will populate the pointer you are passing as second argument.
 func (crypt *MessageEncryptor) DecryptAndVerify(msg string, target interface{}) error {
@@ -57,7 +78,7 @@ func (crypt *MessageEncryptor) DecryptAndVerify(msg string, target interface{}) 
 	// verify the data and get the encoded data out.
 	err := crypt.verifier.Verify(msg, &base64Msg)
 	if err != nil {
-		return err
+		return errors.New("Verification failed: " + err.Error())
 	}
 	return crypt.Decrypt(base64Msg, target)
 }
@@ -69,6 +90,9 @@ func (crypt *MessageEncryptor) Encrypt(value interface{}) (string, error) {
 	switch crypt.cipher {
 	case "aes-cbc":
 		return crypt.aesCbcEncrypt(value)
+	case "":
+		// using a default if not set
+		return crypt.aesCbcEncrypt(value)
 	}
 	return "", errors.New("cipher not set or not supported")
 }
@@ -77,10 +101,13 @@ func (crypt *MessageEncryptor) Encrypt(value interface{}) (string, error) {
 // The passed value is expected to be a base 64 encoded string of the encrypted data + IV joined by "--"
 func (crypt *MessageEncryptor) Decrypt(value string, target interface{}) error {
 	if crypt.serializer == nil {
-		return errors.New("Serializer not set")
+		crypt.serializer = JsonMsgSerializer{}
 	}
 	switch crypt.cipher {
 	case "aes-cbc":
+		return crypt.aesCbcDecrypt(value, target)
+	case "":
+		// using a default if not set
 		return crypt.aesCbcDecrypt(value, target)
 	}
 	return errors.New("cipher not set or not supported")

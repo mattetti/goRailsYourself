@@ -17,6 +17,10 @@ func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) 
 		return "", err
 	}
 
+	// Set a default serializer if not already set
+	if crypt.serializer == nil {
+		crypt.serializer = JsonMsgSerializer{}
+	}
 	splaintext, err := crypt.serializer.Serialize(value)
 	if err != nil {
 		return "", err
