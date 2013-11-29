@@ -7,3 +7,4 @@ go:
 install:
   - go get -u github.com/franela/goblin
   - go get -u code.google.com/p/go.crypto/pbkdf2
+  - go get -u github.com/fiam/gounidecode/unidecode
