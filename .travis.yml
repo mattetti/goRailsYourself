@@ -1,10 +1,9 @@
 language: go
 go: 
- - 1.0
  - 1.1
  - release
  - tip
 
 install:
-  - go get github.com/franela/goblin
-  - go get code.google.com/p/go.crypto/pbkdf2
+  - go get -u github.com/franela/goblin
+  - go get -u code.google.com/p/go.crypto/pbkdf2
