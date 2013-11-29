@@ -74,6 +74,14 @@ func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error)
 // avoid padding attacks. Reference: http://www.limited-entropy.com/padding-oracle-attacks.
 // The serializer will populate the pointer you are passing as second argument.
 func (crypt *MessageEncryptor) DecryptAndVerify(msg string, target interface{}) error {
+	// Set a default verifier if a signature key was given instead of setting the verifier directly.
+	if crypt.verifier == nil && crypt.SignKey != nil {
+		crypt.verifier = &MessageVerifier{
+			secret:     crypt.SignKey,
+			hasher:     sha1.New,
+			serializer: NullMsgSerializer{},
+		}
+	}
 	var base64Msg string
 	// verify the data and get the encoded data out.
 	err := crypt.verifier.Verify(msg, &base64Msg)
