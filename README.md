@@ -1,6 +1,12 @@
 goRailsYourself
 ===============
 
+[![GoDoc](http://godoc.org/github.com/mattetti/goRailsYourself?status.png)](http://godoc.org/github.com/mattetti/goRailsYourself)
+
+[![Build
+Status](https://travis-ci.org/mattetti/goRailsYourself.png)](https://travis-ci.org/mattetti/goRailsYourself)
+
+
 A suite of random functions needed when porting/mixing Go/Rails code. Use at your own risk, don't expect much and feel free to send lots of awesome pull requests.
 
 
