@@ -49,12 +49,12 @@ func (crypt *MessageVerifier) Verify(msg string, target interface{}) error {
 
 	dataDigest := strings.Split(msg, "--")
 	if len(dataDigest) != 2 {
-		return invalid("bad data")
+		return invalid("bad data --")
 	}
 
 	data, digest := dataDigest[0], dataDigest[1]
 	if crypt.secureCompare(digest, crypt.DigestFor(data)) == false {
-		return invalid("bad data")
+		return invalid("bad data (compare)")
 	}
 	decodedData, err := base64.StdEncoding.DecodeString(data)
 	err = crypt.serializer.Unserialize(string(decodedData), target)
@@ -87,7 +87,7 @@ func (crypt *MessageVerifier) DigestFor(data string) string {
 		return "Y U SET NO SECRET???!"
 	}
 
-	mac := hmac.New(crypt.hasher, []byte(crypt.secret))
+	mac := hmac.New(crypt.hasher, crypt.secret)
 	mac.Write([]byte(data))
 	return hex.EncodeToString(mac.Sum(nil))
 }

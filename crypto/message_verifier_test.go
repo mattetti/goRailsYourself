@@ -129,12 +129,12 @@ func TestMessageVerifier(t *testing.T) {
 				g.Assert(err).Eql(nil)
 				str := reverse(d) + "--" + h
 				err = v.Verify(str, &verified)
-				g.Assert(err.Error()).Eql("Invalid signature - bad data")
+				g.Assert(err.Error()).Eql("Invalid signature - bad data (compare)")
 				str = d + "--" + reverse(h)
 				err = v.Verify(str, &verified)
-				g.Assert(err.Error()).Eql("Invalid signature - bad data")
+				g.Assert(err.Error()).Eql("Invalid signature - bad data (compare)")
 				err = v.Verify("gargabe data", &verified)
-				g.Assert(err.Error()).Eql("Invalid signature - bad data")
+				g.Assert(err.Error()).Eql("Invalid signature - bad data --")
 			})
 		})
 

@@ -12,7 +12,14 @@ import (
 
 func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) {
 	// TODO: check the crypt is properly initiated
-	block, err := aes.NewCipher(crypt.Key)
+	k := crypt.Key
+	// The longest accepted key is 32 byte long,
+	// instead of rejecting a long key, we truncate it.
+	// This is how openssl in Ruby works. And yes, it is weird.
+	if len(k) > 32 {
+		k = crypt.Key[:32]
+	}
+	block, err := aes.NewCipher(k)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +57,15 @@ func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) 
 }
 
 func (crypt *MessageEncryptor) aesCbcDecrypt(encryptedMsg string, target interface{}) error {
-	block, err := aes.NewCipher(crypt.Key)
+	k := crypt.Key
+	// The longest accepted key is 32 byte long,
+	// instead of rejecting a long key, we truncate it.
+	// This is how openssl in Ruby works. And yes, it is weird.
+	if len(k) > 32 {
+		k = crypt.Key[:32]
+	}
+
+	block, err := aes.NewCipher(k)
 	if err != nil {
 		return err
 	}
@@ -58,7 +73,7 @@ func (crypt *MessageEncryptor) aesCbcDecrypt(encryptedMsg string, target interfa
 	// split the msg and decode each part
 	splitMsg := strings.Split(encryptedMsg, "--")
 	if len(splitMsg) != 2 {
-		return errors.New("bad data")
+		return errors.New("bad data (--)")
 	}
 
 	ciphertext, err := base64.StdEncoding.DecodeString(splitMsg[0])

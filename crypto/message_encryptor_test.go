@@ -116,6 +116,29 @@ func TestMessageEncryptor(t *testing.T) {
 	})
 }
 
+func TestDecryptingRailsSession(t *testing.T) {
+	g := Goblin(t)
+
+	g.Describe("A Rails JSON session", func() {
+		cookieContent := "TDZIdC9GcEVRSnR0aFlqYTI1SmRWTmw3NWxpRkJZNDVMK0NIUXFlcThWWitLeVQzMFVBUTE2RU82RnRsUUxQWnhyWG95dFJSRDc0OVpkVzhGWXlIb1hERHhPdk5mYStkd3pVVUZNbE1vcDRqU01MYVZJMVpMWVI5SmIweFo1N2tqWTdZcVhyWmdnc2NhZUY2b1BBMlNKWkVsT0Y0aEVQcVVKaGRISk0zR3JLWXdjaFMxamN2aThVL2hBMHBmSGx5bGg4UjUzRFErejlQVEM0eUZjcStSM3VYUkNERjBMdUVqQzZaQk5ZNHpjRT0tLUhDQ2RraWpKRDBleUp1Rm1OeVA5Snc9PQ==--61cd94a037a0a006a01403952a652ddc5da1a597"
+		railsSecret := "f7b5763636f4c1f3ff4bd444eacccca295d87b990cc104124017ad70550edcfd22b8e89465338254e0b608592a9aac29025440bfd9ce53579835ba06a86f85f9"
+		encryptedCookieSalt := []byte("encrypted cookie")
+		encryptedSignedCookieSalt := []byte("signed encrypted cookie")
+
+		kg := KeyGenerator{Secret: railsSecret}
+		secret := kg.CacheGenerate(encryptedCookieSalt, 64)
+		signSecret := kg.CacheGenerate(encryptedSignedCookieSalt, 64)
+		e := MessageEncryptor{Key: secret, SignKey: signSecret}
+
+		g.It("can be decrypted", func() {
+			var session map[string]interface{}
+			err := e.DecryptAndVerify(cookieContent, &session)
+			g.Assert(err).Eql(nil)
+			g.Assert(session["session_id"]).Eql("b2d63c07ea7a9d58e415e3672e3f31a2")
+		})
+	})
+}
+
 func ExampleMessageEncryptor_EncryptAndSign() {
 	type Person struct {
 		Id        int    `json:"id"`
