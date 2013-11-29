@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"crypto/hmac"
+	"crypto/sha1"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
@@ -16,9 +17,12 @@ import (
 // This is useful for cases like remember-me tokens and auto-unsubscribe links
 // where the session store isn't suitable or available.
 type MessageVerifier struct {
-	secret     []byte
-	hasher     func() hash.Hash
-	serializer MsgSerializer
+	// Secret of 32-bytes if using the default hashing.
+	Secret []byte
+	// Hasher defaults to sha1 if not set.
+	Hasher func() hash.Hash
+	// Serializer defines the way the data is serializer/deserialized.
+	Serializer MsgSerializer
 }
 
 // Checks that the struct is properly set and ready for use.
@@ -57,7 +61,7 @@ func (crypt *MessageVerifier) Verify(msg string, target interface{}) error {
 		return invalid("bad data (compare)")
 	}
 	decodedData, err := base64.StdEncoding.DecodeString(data)
-	err = crypt.serializer.Unserialize(string(decodedData), target)
+	err = crypt.Serializer.Unserialize(string(decodedData), target)
 	return err
 }
 
@@ -71,7 +75,7 @@ func (crypt *MessageVerifier) Generate(value interface{}) (string, error) {
 		return "", err
 	}
 
-	data, err := crypt.serializer.Serialize(value)
+	data, err := crypt.Serializer.Serialize(value)
 	if err != nil {
 		return "", err
 	}
@@ -83,11 +87,11 @@ func (crypt *MessageVerifier) Generate(value interface{}) (string, error) {
 // DigestFor returns the digest form of a string after hashing it via
 // the verifier's digest and secret.
 func (crypt *MessageVerifier) DigestFor(data string) string {
-	if crypt.secret == nil {
+	if crypt.Secret == nil {
 		return "Y U SET NO SECRET???!"
 	}
 
-	mac := hmac.New(crypt.hasher, crypt.secret)
+	mac := hmac.New(crypt.Hasher, crypt.Secret)
 	mac.Write([]byte(data))
 	return hex.EncodeToString(mac.Sum(nil))
 }
@@ -111,15 +115,16 @@ func (crypt *MessageVerifier) checkInit() error {
 	if crypt == nil {
 		return errors.New("MessageVerifier not set")
 	}
-	if crypt.serializer == nil {
+	if crypt.Serializer == nil {
 		return errors.New("Serializer not set")
 	}
 
-	if crypt.hasher == nil {
-		return errors.New("Hasher not set")
+	if crypt.Hasher == nil {
+		// set a default hasher
+		crypt.Hasher = sha1.New
 	}
 
-	if crypt.secret == nil {
+	if crypt.Secret == nil {
 		return errors.New("Secret not set")
 	}
 

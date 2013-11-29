@@ -24,7 +24,7 @@ Key components of this package
 The main components of this package are:
 
   * MessageEncryptor
-  * MessageVerifier 
+  * MessageVerifier
   * KeyGenerator
 
 The difference between MessageVerifier and MessageEncryptor is that you
@@ -60,11 +60,11 @@ Here is a quick and high level of what Rails does (Ruby code):
 
    # Secret set in the app.
     secret_key_base = "f7b5763636f4c1f3ff4bd444eacccca295d87b990cc104124017ad70550edcfd22b8e89465338254e0b608592a9aac29025440bfd9ce53579835ba06a86f85f9"
-          
+
     key_generator = ActiveSupport::CachingKeyGenerator.new(ActiveSupport::KeyGenerator.new(secret_key_base, iterations: 1000))
     secret = key_generator.generate_key("encrypted cookie")
     sign_secret = key_generator.generate_key("signed encrypted cookie")
-     
+
     encryptor = ActiveSupport::MessageEncryptor.new(secret, sign_secret, { serializer: JsonSessionSerializer } )
     # encrypt and sign the content of the session:
     encrypted_message = encryptor.encrypt_and_sign({msg: "hello world"})
@@ -85,17 +85,17 @@ generating the keys in Go, we need to match the iteration number to get
 the same keys. Note also that if the salt is changed in the Rails app,
 you need to update it in your Go code.
 
-There are two derived keys: one for encryption and one for signing. 
+There are two derived keys: one for encryption and one for signing.
 These keys are derived from the same secret but are different to
 increase security. The keys are also of two different length.
 The message signature is done by default using HMAC/sha1 requiring
 a key of 64 bytes. However, the message is encrypted by default using
-AES-256 CBC requiring a key of 32 bytes. 
+AES-256 CBC requiring a key of 32 bytes.
 Ruby's openssl library and this package automatically truncate longer
-AES CBC keys so you can use two 64 byte keys. 
+AES CBC keys so you can use two 64 byte keys.
 This is exactly what Rails does, it generates two keys of same length (64 bytes) and
 lets the OpenSSL wrapper truncate the key. I, however recommend you
-generate keys of different length to avoid any confusion. 
+generate keys of different length to avoid any confusion.
 Here is an example:
 
   railsSecret := "f7b5763636f4c1f3ff4bd444eacccca295d87b990cc104124017ad70550edcfd22b8e89465338254e0b608592a9aac29025440bfd9ce53579835ba06a86f85f9"

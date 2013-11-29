@@ -31,8 +31,8 @@ func TestMessageVerifier(t *testing.T) {
 	g.Describe("a malformed MessageVerifier", func() {
 		g.Describe("without a serializer", func() {
 			v := MessageVerifier{
-				secret: []byte("Hey, I'm a secret!"),
-				hasher: sha1.New,
+				Secret: []byte("Hey, I'm a secret!"),
+				Hasher: sha1.New,
 			}
 
 			g.It("won't generate messages", func() {
@@ -51,30 +51,40 @@ func TestMessageVerifier(t *testing.T) {
 		})
 
 		g.Describe("without a hasher", func() {
+			secret := []byte("Hey, I'm a secret!")
 			v := MessageVerifier{
-				secret:     []byte("Hey, I'm a secret!"),
-				serializer: JsonMsgSerializer{},
+				Secret:     secret,
+				Serializer: NullMsgSerializer{},
 			}
 
-			g.It("won't generate messages", func() {
+			g.It("will generate messages using the default sha1 hasher", func() {
 				foo := "foo"
 				str, err := v.Generate(foo)
-				g.Assert(err.Error()).Eql("Hasher not set")
-				g.Assert(str).Eql("")
+				g.Assert(err).Eql(nil)
+				g.Assert(str != "").Eql(true)
 			})
 
-			g.It("won't verify messages", func() {
-				var foo string
-				err := v.Verify("foo", foo)
-				g.Assert(err.Error()).Eql("Hasher not set")
+			g.It("will verify messages using the default sha1 hasher", func() {
+				vv := MessageVerifier{
+					Secret:     secret,
+					Hasher:     sha1.New,
+					Serializer: NullMsgSerializer{},
+				}
+				str, err := vv.Generate("this is a test")
+				g.Assert(err).Eql(nil)
+
+				var result string
+				err = v.Verify(str, &result)
+				g.Assert(err).Eql(nil)
+				g.Assert(result).Eql("this is a test")
 			})
 
 		})
 
 		g.Describe("without a secret", func() {
 			v := MessageVerifier{
-				serializer: JsonMsgSerializer{},
-				hasher:     sha1.New,
+				Serializer: JsonMsgSerializer{},
+				Hasher:     sha1.New,
 			}
 
 			g.It("won't generate messages", func() {
@@ -97,9 +107,9 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using SHA1", func() {
 			v := MessageVerifier{
-				secret:     []byte("Hey, I'm a secret!"),
-				hasher:     sha1.New,
-				serializer: JsonMsgSerializer{},
+				Secret:     []byte("Hey, I'm a secret!"),
+				Hasher:     sha1.New,
+				Serializer: JsonMsgSerializer{},
 			}
 
 			g.It("properly digests a string", func() {
@@ -140,9 +150,9 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using SHA256", func() {
 			v := MessageVerifier{
-				secret:     []byte("Hey, I'm a secret!"),
-				hasher:     sha256.New,
-				serializer: JsonMsgSerializer{},
+				Secret:     []byte("Hey, I'm a secret!"),
+				Hasher:     sha256.New,
+				Serializer: JsonMsgSerializer{},
 			}
 
 			g.It("can do a round trip verification", func() {
@@ -158,9 +168,9 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using SHA512", func() {
 			v := MessageVerifier{
-				secret:     []byte("Hey, I'm a secret!"),
-				hasher:     sha512.New,
-				serializer: JsonMsgSerializer{},
+				Secret:     []byte("Hey, I'm a secret!"),
+				Hasher:     sha512.New,
+				Serializer: JsonMsgSerializer{},
 			}
 
 			g.It("can do a round trip verification", func() {
@@ -176,9 +186,9 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using md5", func() {
 			v := MessageVerifier{
-				secret:     []byte("Hey, I'm a secret!"),
-				hasher:     md5.New,
-				serializer: JsonMsgSerializer{},
+				Secret:     []byte("Hey, I'm a secret!"),
+				Hasher:     md5.New,
+				Serializer: JsonMsgSerializer{},
 			}
 
 			g.It("can do a round trip verification", func() {
@@ -197,9 +207,8 @@ func TestMessageVerifier(t *testing.T) {
 	g.Describe("A MessageVerifier with a secret and a XML serializer", func() {
 
 		v := MessageVerifier{
-			secret:     []byte("Hey, I'm another secret!"),
-			hasher:     sha1.New,
-			serializer: XMLMsgSerializer{},
+			Secret:     []byte("Hey, I'm another secret!"),
+			Serializer: XMLMsgSerializer{},
 		}
 
 		g.It("can do a round trip verification using SHA1", func() {
@@ -217,9 +226,8 @@ func TestMessageVerifier(t *testing.T) {
 
 func ExampleMessageVerifier_Generate() {
 	v := MessageVerifier{
-		secret:     []byte("Hey, I'm a secret!"),
-		hasher:     sha1.New,
-		serializer: JsonMsgSerializer{},
+		Secret:     []byte("Hey, I'm a secret!"),
+		Serializer: JsonMsgSerializer{},
 	}
 	foo := map[string]interface{}{"foo": "this is foo", "bar": 42, "baz": []string{"bar", "baz"}}
 	generated, _ := v.Generate(foo)
@@ -230,9 +238,8 @@ func ExampleMessageVerifier_Generate() {
 
 func ExampleMessageVerifier_Verify() {
 	v := MessageVerifier{
-		secret:     []byte("Hey, I'm a secret!"),
-		hasher:     sha1.New,
-		serializer: JsonMsgSerializer{},
+		Secret:     []byte("Hey, I'm a secret!"),
+		Serializer: JsonMsgSerializer{},
 	}
 
 	data := testStruct{Foo: "foo", Bar: 42}

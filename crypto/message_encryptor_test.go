@@ -29,7 +29,7 @@ func TestMessageEncryptorDefaultSettings(t *testing.T) {
 			var newMsg string
 			err = e.DecryptAndVerify(msg, &newMsg)
 			g.Assert(err).Eql(nil)
-      g.Assert(newMsg).Eql("my secret data")
+			g.Assert(newMsg).Eql("my secret data")
 		})
 
 	})
@@ -42,13 +42,13 @@ func TestMessageEncryptor(t *testing.T) {
 	g.Describe("MessageEncryptor properly setup using aes cbc", func() {
 		newCrypt := func() MessageEncryptor {
 			return MessageEncryptor{Key: GenerateRandomKey(32),
-				cipher: "aes-cbc",
-				verifier: &MessageVerifier{
-					secret:     []byte("signature secret!"),
-					hasher:     sha1.New,
-					serializer: NullMsgSerializer{},
+				Cipher: "aes-cbc",
+				Verifier: &MessageVerifier{
+					Secret:     []byte("signature secret!"),
+					Hasher:     sha1.New,
+					Serializer: NullMsgSerializer{},
 				},
-				serializer: JsonMsgSerializer{},
+				Serializer: JsonMsgSerializer{},
 			}
 		}
 
@@ -169,7 +169,7 @@ func ExampleMessageEncryptor_EncryptAndSign() {
 
 func ExampleMessageEncryptor_DecryptAndVerify() {
 
-  type Person struct {
+	type Person struct {
 		Id        int    `json:"id"`
 		FirstName string `json:"firstName"`
 		LastName  string `json:"lastName"`
@@ -177,18 +177,18 @@ func ExampleMessageEncryptor_DecryptAndVerify() {
 	}
 	john := Person{Id: 12, FirstName: "John", LastName: "Doe", Age: 42}
 
-  railsSecret := "f7b5763636f4c1f3ff4bd444eacccca295d87b990cc104124017ad70550edcfd22b8e89465338254e0b608592a9aac29025440bfd9ce53579835ba06a86f85f9"
-  encryptedCookieSalt := []byte("encrypted cookie")
-  encryptedSignedCookieSalt := []byte("signed encrypted cookie")
+	railsSecret := "f7b5763636f4c1f3ff4bd444eacccca295d87b990cc104124017ad70550edcfd22b8e89465338254e0b608592a9aac29025440bfd9ce53579835ba06a86f85f9"
+	encryptedCookieSalt := []byte("encrypted cookie")
+	encryptedSignedCookieSalt := []byte("signed encrypted cookie")
 
-  kg := KeyGenerator{Secret: railsSecret}
-  // use 64 bit keys since the encryption uses 32 bytes
-  // but the signature uses 64. The crypto package handles that well.
-  secret := kg.CacheGenerate(encryptedCookieSalt, 32)
-  signSecret := kg.CacheGenerate(encryptedSignedCookieSalt, 64)
-  e := MessageEncryptor{Key: secret, SignKey: signSecret}
-  sessionString, err := e.EncryptAndSign(john)
-  if err != nil {
+	kg := KeyGenerator{Secret: railsSecret}
+	// use 64 bit keys since the encryption uses 32 bytes
+	// but the signature uses 64. The crypto package handles that well.
+	secret := kg.CacheGenerate(encryptedCookieSalt, 32)
+	signSecret := kg.CacheGenerate(encryptedSignedCookieSalt, 64)
+	e := MessageEncryptor{Key: secret, SignKey: signSecret}
+	sessionString, err := e.EncryptAndSign(john)
+	if err != nil {
 		panic(err)
 	}
 

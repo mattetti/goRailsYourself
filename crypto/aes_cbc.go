@@ -25,10 +25,10 @@ func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) 
 	}
 
 	// Set a default serializer if not already set
-	if crypt.serializer == nil {
-		crypt.serializer = JsonMsgSerializer{}
+	if crypt.Serializer == nil {
+		crypt.Serializer = JsonMsgSerializer{}
 	}
-	splaintext, err := crypt.serializer.Serialize(value)
+	splaintext, err := crypt.Serializer.Serialize(value)
 	if err != nil {
 		return "", err
 	}
@@ -61,9 +61,9 @@ func (crypt *MessageEncryptor) aesCbcDecrypt(encryptedMsg string, target interfa
 	// The longest accepted key is 32 byte long,
 	// instead of rejecting a long key, we truncate it.
 	// This is how openssl in Ruby works.
-  if len(k) > 32 {
-    k = crypt.Key[:32]
-  }
+	if len(k) > 32 {
+		k = crypt.Key[:32]
+	}
 
 	block, err := aes.NewCipher(k)
 	if err != nil {
@@ -96,5 +96,5 @@ func (crypt *MessageEncryptor) aesCbcDecrypt(encryptedMsg string, target interfa
 	mode.CryptBlocks(ciphertext, ciphertext)
 	unPaddedCiphertext := PKCS7Unpad(ciphertext)
 
-	return crypt.serializer.Unserialize(string(unPaddedCiphertext), target)
+	return crypt.Serializer.Unserialize(string(unPaddedCiphertext), target)
 }

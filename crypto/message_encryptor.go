@@ -25,9 +25,9 @@ type MessageEncryptor struct {
 	// optional property used to automatically set the
 	// verifier if not already set.
 	SignKey    []byte
-	cipher     string
-	verifier   *MessageVerifier
-	serializer MsgSerializer
+	Cipher     string
+	Verifier   *MessageVerifier
+	Serializer MsgSerializer
 }
 
 // Encrypt and sign a message (string, struct, anything that can be safely serialized/serialized).
@@ -40,17 +40,17 @@ type MessageEncryptor struct {
 // and is encoded using base64.
 func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error) {
 	// Set a default verifier if a signature key was given instead of setting the verifier directly.
-	if crypt.verifier == nil && crypt.SignKey != nil {
-		crypt.verifier = &MessageVerifier{
-			secret:     crypt.SignKey,
-			hasher:     sha1.New,
-			serializer: NullMsgSerializer{},
+	if crypt.Verifier == nil && crypt.SignKey != nil {
+		crypt.Verifier = &MessageVerifier{
+			Secret:     crypt.SignKey,
+			Hasher:     sha1.New,
+			Serializer: NullMsgSerializer{},
 		}
 	}
-	if crypt.verifier == nil {
+	if crypt.Verifier == nil {
 		return "", errors.New("Verifier and/or signature key not set: ")
 	}
-	vvalid, err := crypt.verifier.IsValid()
+	vvalid, err := crypt.Verifier.IsValid()
 	if !vvalid {
 		return "", errors.New("Verifier not properly set: " + err.Error())
 	}
@@ -58,7 +58,7 @@ func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error)
 	if err != nil {
 		return "", err
 	}
-	return crypt.verifier.Generate(encryptedMsg)
+	return crypt.Verifier.Generate(encryptedMsg)
 }
 
 // Decrypt and verify a message. Messages need to be signed on top of being encrypted in order to
@@ -66,16 +66,16 @@ func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error)
 // The serializer will populate the pointer you are passing as second argument.
 func (crypt *MessageEncryptor) DecryptAndVerify(msg string, target interface{}) error {
 	// Set a default verifier if a signature key was given instead of setting the verifier directly.
-	if crypt.verifier == nil && crypt.SignKey != nil {
-		crypt.verifier = &MessageVerifier{
-			secret:     crypt.SignKey,
-			hasher:     sha1.New,
-			serializer: NullMsgSerializer{},
+	if crypt.Verifier == nil && crypt.SignKey != nil {
+		crypt.Verifier = &MessageVerifier{
+			Secret:     crypt.SignKey,
+			Hasher:     sha1.New,
+			Serializer: NullMsgSerializer{},
 		}
 	}
 	var base64Msg string
 	// verify the data and get the encoded data out.
-	err := crypt.verifier.Verify(msg, &base64Msg)
+	err := crypt.Verifier.Verify(msg, &base64Msg)
 	if err != nil {
 		return errors.New("Verification failed: " + err.Error())
 	}
@@ -86,7 +86,7 @@ func (crypt *MessageEncryptor) DecryptAndVerify(msg string, target interface{}) 
 // The returned value is a base 64 encoded string of the encrypted data + IV joined by "--".
 // An encrypted message isn't safe unless it's signed!
 func (crypt *MessageEncryptor) Encrypt(value interface{}) (string, error) {
-	switch crypt.cipher {
+	switch crypt.Cipher {
 	case "aes-cbc":
 		return crypt.aesCbcEncrypt(value)
 	case "":
@@ -99,10 +99,10 @@ func (crypt *MessageEncryptor) Encrypt(value interface{}) (string, error) {
 // decrypt() decrypts a message using the set cipher and the secret.
 // The passed value is expected to be a base 64 encoded string of the encrypted data + IV joined by "--"
 func (crypt *MessageEncryptor) Decrypt(value string, target interface{}) error {
-	if crypt.serializer == nil {
-		crypt.serializer = JsonMsgSerializer{}
+	if crypt.Serializer == nil {
+		crypt.Serializer = JsonMsgSerializer{}
 	}
-	switch crypt.cipher {
+	switch crypt.Cipher {
 	case "aes-cbc":
 		return crypt.aesCbcDecrypt(value, target)
 	case "":
