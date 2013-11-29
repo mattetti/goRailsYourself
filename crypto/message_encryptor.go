@@ -20,18 +20,9 @@ import (
 // Note that as I'm writing this library, Rails default serializer is Ruby's Marshal
 // which is not safe and cross language. You need to switch the serializer to JSON or another
 // safer/cross language format to share encrypted messages between Ruby and Go.
-
-// Ruby/Rails 4 usage:
-// require 'active_support'
-// require 'json'
-// salt  = SecureRandom.random_bytes(64)
-// key   = ActiveSupport::KeyGenerator.new('password').generate_key(salt)
-// crypt = ActiveSupport::MessageEncryptor.new(key, "this is the sign secret", serializer: JSON)
-// encrypted_data = crypt.encrypt_and_sign('my secret data')              # => "emsxbm5HcVJWRmhZTzNPTEFjTERHUjJjbmpIWXF5UzNITWhMem5sUnNZRT0tLVVCak1GeDFrSHVxaGFyeVpqRlVLNHc9PQ==--789d60509d8b441a24600bbf48af47d3eff386b5"
-// crypt.decrypt_and_verify(encrypted_data)                               # => "my secret data"
 type MessageEncryptor struct {
 	Key []byte
-	// optionial property used to automatically set the
+	// optional property used to automatically set the
 	// verifier if not already set.
 	SignKey    []byte
 	cipher     string

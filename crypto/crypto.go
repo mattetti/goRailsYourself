@@ -1,5 +1,3 @@
-// The crypto package ports some of Rails' crypto functions that
-// can be useful outside of Rails. (mainly used to share signed/encryoted messages/cookies/sessions).
 package crypto
 
 import (

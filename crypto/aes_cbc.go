@@ -15,7 +15,7 @@ func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) 
 	k := crypt.Key
 	// The longest accepted key is 32 byte long,
 	// instead of rejecting a long key, we truncate it.
-	// This is how openssl in Ruby works. And yes, it is weird.
+	// This is how openssl in Ruby works.
 	if len(k) > 32 {
 		k = crypt.Key[:32]
 	}
@@ -60,10 +60,10 @@ func (crypt *MessageEncryptor) aesCbcDecrypt(encryptedMsg string, target interfa
 	k := crypt.Key
 	// The longest accepted key is 32 byte long,
 	// instead of rejecting a long key, we truncate it.
-	// This is how openssl in Ruby works. And yes, it is weird.
-	if len(k) > 32 {
-		k = crypt.Key[:32]
-	}
+	// This is how openssl in Ruby works.
+  if len(k) > 32 {
+    k = crypt.Key[:32]
+  }
 
 	block, err := aes.NewCipher(k)
 	if err != nil {
