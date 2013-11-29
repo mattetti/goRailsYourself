@@ -5,8 +5,6 @@ go:
  - release
  - tip
 
-script:
- - go test ./... -v
-
 install:
   - go get github.com/franela/goblin
+  - go get code.google.com/p/go.crypto/pbkdf2
