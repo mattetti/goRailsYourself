@@ -35,7 +35,7 @@ func (crypt *MessageEncryptor) aesCbcEncrypt(value interface{}) (string, error) 
 	plaintext := []byte(splaintext)
 
 	// CBC mode works on blocks so plaintexts may need to be padded to the
-	// next whole block. Pee
+	// next whole block. See
 	// http://tools.ietf.org/html/rfc5652#section-6.3
 	plaintext = PKCS7Pad(plaintext)
 
