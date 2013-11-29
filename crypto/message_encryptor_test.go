@@ -13,7 +13,7 @@ func TestMessageEncryptorDefaultSettings(t *testing.T) {
 
 	g.Describe("MessageEncryptor with default settings", func() {
 		k := GenerateRandomKey(32)
-		signKey := "this is a secret!"
+		signKey := []byte("this is a secret!")
 		e := MessageEncryptor{Key: k, SignKey: signKey}
 		g.It("can round trip an encoded/unsigned string", func() {
 			msg, err := e.Encrypt("my secret data")
@@ -44,7 +44,7 @@ func TestMessageEncryptor(t *testing.T) {
 			return MessageEncryptor{Key: GenerateRandomKey(32),
 				cipher: "aes-cbc",
 				verifier: &MessageVerifier{
-					secret:     "signature secret!",
+					secret:     []byte("signature secret!"),
 					hasher:     sha1.New,
 					serializer: NullMsgSerializer{},
 				},
@@ -126,7 +126,7 @@ func ExampleMessageEncryptor_EncryptAndSign() {
 	john := Person{Id: 12, FirstName: "John", LastName: "Doe", Age: 42}
 
 	k := GenerateRandomKey(32)
-	signKey := "this is a secret!"
+	signKey := []byte("this is a secret!")
 	e := MessageEncryptor{Key: k, SignKey: signKey}
 
 	// string encoding example
@@ -154,7 +154,7 @@ func ExampleMessageEncryptor_DecryptAndVerify() {
 	john := Person{Id: 12, FirstName: "John", LastName: "Doe", Age: 42}
 
 	k := GenerateRandomKey(32)
-	signKey := "this is a secret!"
+	signKey := []byte("this is a secret!")
 	e := MessageEncryptor{Key: k, SignKey: signKey}
 	// string encoding example
 	encryptedString, err := e.EncryptAndSign("my secret data")

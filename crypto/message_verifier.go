@@ -16,7 +16,7 @@ import (
 // This is useful for cases like remember-me tokens and auto-unsubscribe links
 // where the session store isn't suitable or available.
 type MessageVerifier struct {
-	secret     string
+	secret     []byte
 	hasher     func() hash.Hash
 	serializer MsgSerializer
 }
@@ -83,7 +83,7 @@ func (crypt *MessageVerifier) Generate(value interface{}) (string, error) {
 // DigestFor returns the digest form of a string after hashing it via
 // the verifier's digest and secret.
 func (crypt *MessageVerifier) DigestFor(data string) string {
-	if crypt.secret == "" {
+	if crypt.secret == nil {
 		return "Y U SET NO SECRET???!"
 	}
 
@@ -108,6 +108,9 @@ func (crypt *MessageVerifier) secureCompare(strA, strB string) bool {
 }
 
 func (crypt *MessageVerifier) checkInit() error {
+	if crypt == nil {
+		return errors.New("MessageVerifier not set")
+	}
 	if crypt.serializer == nil {
 		return errors.New("Serializer not set")
 	}
@@ -116,7 +119,7 @@ func (crypt *MessageVerifier) checkInit() error {
 		return errors.New("Hasher not set")
 	}
 
-	if crypt.secret == "" {
+	if crypt.secret == nil {
 		return errors.New("Secret not set")
 	}
 

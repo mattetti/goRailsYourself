@@ -31,7 +31,7 @@ func TestMessageVerifier(t *testing.T) {
 	g.Describe("a malformed MessageVerifier", func() {
 		g.Describe("without a serializer", func() {
 			v := MessageVerifier{
-				secret: "Hey, I'm a secret!",
+				secret: []byte("Hey, I'm a secret!"),
 				hasher: sha1.New,
 			}
 
@@ -52,7 +52,7 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("without a hasher", func() {
 			v := MessageVerifier{
-				secret:     "Hey, I'm a secret!",
+				secret:     []byte("Hey, I'm a secret!"),
 				serializer: JsonMsgSerializer{},
 			}
 
@@ -97,7 +97,7 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using SHA1", func() {
 			v := MessageVerifier{
-				secret:     "Hey, I'm a secret!",
+				secret:     []byte("Hey, I'm a secret!"),
 				hasher:     sha1.New,
 				serializer: JsonMsgSerializer{},
 			}
@@ -140,7 +140,7 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using SHA256", func() {
 			v := MessageVerifier{
-				secret:     "Hey, I'm a secret!",
+				secret:     []byte("Hey, I'm a secret!"),
 				hasher:     sha256.New,
 				serializer: JsonMsgSerializer{},
 			}
@@ -158,7 +158,7 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using SHA512", func() {
 			v := MessageVerifier{
-				secret:     "Hey, I'm a secret!",
+				secret:     []byte("Hey, I'm a secret!"),
 				hasher:     sha512.New,
 				serializer: JsonMsgSerializer{},
 			}
@@ -176,7 +176,7 @@ func TestMessageVerifier(t *testing.T) {
 
 		g.Describe("and using md5", func() {
 			v := MessageVerifier{
-				secret:     "Hey, I'm a secret!",
+				secret:     []byte("Hey, I'm a secret!"),
 				hasher:     md5.New,
 				serializer: JsonMsgSerializer{},
 			}
@@ -197,7 +197,7 @@ func TestMessageVerifier(t *testing.T) {
 	g.Describe("A MessageVerifier with a secret and a XML serializer", func() {
 
 		v := MessageVerifier{
-			secret:     "Hey, I'm another secret!",
+			secret:     []byte("Hey, I'm another secret!"),
 			hasher:     sha1.New,
 			serializer: XMLMsgSerializer{},
 		}
@@ -217,7 +217,7 @@ func TestMessageVerifier(t *testing.T) {
 
 func ExampleMessageVerifier_Generate() {
 	v := MessageVerifier{
-		secret:     "Hey, I'm a secret!",
+		secret:     []byte("Hey, I'm a secret!"),
 		hasher:     sha1.New,
 		serializer: JsonMsgSerializer{},
 	}
@@ -230,7 +230,7 @@ func ExampleMessageVerifier_Generate() {
 
 func ExampleMessageVerifier_Verify() {
 	v := MessageVerifier{
-		secret:     "Hey, I'm a secret!",
+		secret:     []byte("Hey, I'm a secret!"),
 		hasher:     sha1.New,
 		serializer: JsonMsgSerializer{},
 	}

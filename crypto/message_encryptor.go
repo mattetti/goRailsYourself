@@ -33,7 +33,7 @@ type MessageEncryptor struct {
 	Key []byte
 	// optionial property used to automatically set the
 	// verifier if not already set.
-	SignKey    string
+	SignKey    []byte
 	cipher     string
 	verifier   *MessageVerifier
 	serializer MsgSerializer
@@ -49,7 +49,7 @@ type MessageEncryptor struct {
 // and is encoded using base64.
 func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error) {
 	// Set a default verifier if a signature key was given instead of setting the verifier directly.
-	if crypt.verifier == nil && crypt.SignKey != "" {
+	if crypt.verifier == nil && crypt.SignKey != nil {
 		crypt.verifier = &MessageVerifier{
 			secret:     crypt.SignKey,
 			hasher:     sha1.New,
