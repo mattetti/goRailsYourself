@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -95,6 +96,13 @@ func (crypt *MessageEncryptor) aesCbcDecrypt(encryptedMsg string, target interfa
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(ciphertext, ciphertext)
 	unPaddedCiphertext := PKCS7Unpad(ciphertext)
+
+	// In some cases, Rails sends us messages padded with 0x10 (while this package only pads with 0x01-0x0f).
+	// For now, we handle this case here when the Serializer is JSON (so we know that 0x10 is actually a padding
+	// and not valid data - because this is an invalid json character).
+	if _, ok := crypt.Serializer.(JsonMsgSerializer); ok {
+		unPaddedCiphertext = bytes.TrimRight(unPaddedCiphertext, "\x10")
+	}
 
 	return crypt.Serializer.Unserialize(string(unPaddedCiphertext), target)
 }
