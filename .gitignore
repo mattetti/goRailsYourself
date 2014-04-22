@@ -21,3 +21,7 @@ _testmain.go
 
 *.test
 *.exe
+
+# vim temp files
+.*.swp
+.*.swo

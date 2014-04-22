@@ -26,6 +26,10 @@ func PKCS7Pad(data []byte) []byte {
 // PKCS7Unpad() removes any potential PKCS7 padding added.
 func PKCS7Unpad(data []byte) []byte {
 	dataLen := len(data)
+    // Edge case
+    if dataLen == 0 {
+        return nil
+    }
 	// the last byte indicates the length of the padding to remove
 	paddingLen := int(data[dataLen-1])
 
