@@ -39,6 +39,9 @@ type MessageEncryptor struct {
 // The output string can be converted back using DecryptAndVerify()
 // and is encoded using base64.
 func (crypt *MessageEncryptor) EncryptAndSign(value interface{}) (string, error) {
+	if crypt == nil {
+		return "", errors.New("can't call EncryptAndSign on a nil *MessageEncryptor")
+	}
 	// Set a default verifier if a signature key was given instead of setting the verifier directly.
 	if crypt.Verifier == nil && crypt.SignKey != nil {
 		crypt.Verifier = &MessageVerifier{
