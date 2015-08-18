@@ -1,7 +1,7 @@
 package crypto
 
 import (
-	"code.google.com/p/go.crypto/pbkdf2"
+	"golang.org/x/crypto/pbkdf2"
 	"crypto/sha1"
 	"fmt"
 )

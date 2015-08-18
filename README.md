@@ -19,7 +19,7 @@ The inflector package relies on:
  [unidecode](http://godoc.org/github.com/fiam/gounidecode/unidecode) to handle the transliteration.
 
 The crypto package relies on:
-  [pbkdf2](http://code.google.com/p/go.crypto/pbkdf2) to handle the
+  [pbkdf2](http://golang.org/x/crypto/pbkdf2) to handle the
 generation of derived keys.
 
 The test suite uses
