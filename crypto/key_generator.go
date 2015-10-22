@@ -1,9 +1,10 @@
 package crypto
 
 import (
-	"code.google.com/p/go.crypto/pbkdf2"
 	"crypto/sha1"
 	"fmt"
+
+	"golang.org/x/crypto/pbkdf2"
 )
 
 // KeyGenerator is a simple wrapper around a PBKDF2 implementation.
