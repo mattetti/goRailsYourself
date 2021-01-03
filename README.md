@@ -3,9 +3,6 @@ goRailsYourself
 
 [![GoDoc](http://godoc.org/github.com/mattetti/goRailsYourself?status.png)](https://pkg.go.dev/github.com/mattetti/goRailsYourself)
 
-[![Build
-Status](https://travis-ci.org/mattetti/goRailsYourself.png)](https://travis-ci.org/mattetti/goRailsYourself)
-
 
 A suite of packages useful when you have to deal with Go and Rails apps
 or when migrating from Ruby to Go. 
