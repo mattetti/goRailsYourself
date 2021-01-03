@@ -1,8 +1,9 @@
 package crypto
 
 import (
-	. "github.com/franela/goblin"
 	"testing"
+
+	. "github.com/franela/goblin"
 )
 
 func TestNullSerializerSerializer(t *testing.T) {
@@ -28,14 +29,14 @@ func TestNullSerializerSerializer(t *testing.T) {
 
 		g.It("serializes properly", func() {
 			g.Assert(err).Eql(err)
-			g.Assert(output).Eql("map[foo:matt bar:aimonetti]")
+			g.Assert(output).Eql("map[bar:aimonetti foo:matt]")
 		})
 
 		g.It("can be deserialized", func() {
 			var o string
 			err := serializer.Unserialize(output, &o)
 			g.Assert(err).Eql(nil)
-			g.Assert(o).Eql("map[foo:matt bar:aimonetti]")
+			g.Assert(o).Eql("map[bar:aimonetti foo:matt]")
 		})
 	})
 
