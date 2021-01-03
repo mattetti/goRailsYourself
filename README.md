@@ -1,14 +1,16 @@
 goRailsYourself
 ===============
 
-[![GoDoc](http://godoc.org/github.com/mattetti/goRailsYourself?status.png)](http://godoc.org/github.com/mattetti/goRailsYourself)
+[![GoDoc](http://godoc.org/github.com/mattetti/goRailsYourself?status.png)](https://pkg.go.dev/github.com/mattetti/goRailsYourself)
 
 [![Build
 Status](https://travis-ci.org/mattetti/goRailsYourself.png)](https://travis-ci.org/mattetti/goRailsYourself)
 
 
 A suite of packages useful when you have to deal with Go and Rails apps
-or when migrating from Ruby to Go. Use at your own risk, don't expect much and feel free to send lots of awesome pull requests.
+or when migrating from Ruby to Go. 
+
+The crypto package allows for shared authentication cookie support with Rails, included version 5.2+.
 
 
 See the [documentation](http://godoc.org/github.com/mattetti/goRailsYourself) and/or the test suite for more examples.
