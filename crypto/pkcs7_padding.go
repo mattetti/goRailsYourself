@@ -5,12 +5,7 @@ package crypto
 func PKCS7Pad(data []byte) []byte {
 	dataLen := len(data)
 
-	var validLen int
-	if dataLen%16 == 0 {
-		validLen = dataLen
-	} else {
-		validLen = int(dataLen/16+1) * 16
-	}
+	validLen := int(dataLen/16+1) * 16
 
 	paddingLen := validLen - dataLen
 	// The length of the padding is used as the byte we will
@@ -26,15 +21,16 @@ func PKCS7Pad(data []byte) []byte {
 // PKCS7Unpad() removes any potential PKCS7 padding added.
 func PKCS7Unpad(data []byte) []byte {
 	dataLen := len(data)
-    // Edge case
-    if dataLen == 0 {
-        return nil
-    }
+	// Edge case
+	if dataLen == 0 {
+		return nil
+	}
 	// the last byte indicates the length of the padding to remove
 	paddingLen := int(data[dataLen-1])
 
-	// padding length can only be between 1-15
-	if paddingLen < 16 {
+	if paddingLen == dataLen {
+		return nil
+	} else if paddingLen < dataLen {
 		return data[:dataLen-paddingLen]
 	}
 	return data
